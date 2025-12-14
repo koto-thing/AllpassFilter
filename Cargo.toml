@@ -1,0 +1,7 @@
+﻿[workspace]
+members = [
+    "allpass_filter",
+    "simple_reverb",
+]
+
+resolver = "2"

@@ -6,6 +6,7 @@ pub mod delay;
 pub mod allpass;
 pub mod interpolation;
 pub mod parameter;
+pub mod capi;
 
 pub use delay::DelayLine;
 pub use allpass::AllPassFilter;
