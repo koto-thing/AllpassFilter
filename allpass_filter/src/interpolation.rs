@@ -7,6 +7,10 @@ pub trait Interpolator<T> {
 pub struct Linear;
 
 impl<T: Float> Interpolator<T> for Linear {
+    /// 線形補間を行う
+    /// `buffer`: 補間対象のリングバッファ
+    /// `read_pos`: 読み出し位置（小数点以下を含む）
+    /// 戻り値: 補間されたサンプル値
     fn interpolate(&self, buffer: &[T], read_pos: f64) -> T {
         let len = buffer.len();
         
@@ -30,6 +34,10 @@ impl<T: Float> Interpolator<T> for Linear {
 pub struct Nearest;
 
 impl<T: Float> Interpolator<T> for Nearest {
+    /// 最近傍補間を行う
+    /// `buffer`: 補間対象のリングバッファ
+    /// `read_pos`: 読み出し位置（小数点以下を含む）
+    /// 戻り値: 補間されたサンプル値
     fn interpolate(&self, buffer: &[T], read_pos: f64) -> T {
         let index = (read_pos.round() as usize) % buffer.len();
         buffer[index]
@@ -39,9 +47,14 @@ impl<T: Float> Interpolator<T> for Nearest {
 pub struct Cubic;
 
 impl<T: Float> Interpolator<T> for Cubic {
+    /// 3次補間（Catmull-Romスプライン）を行う
+    /// `buffer`: 補間対象のリングバッファ
+    /// `read_pos`: 読み出し位置（小数点以下を含む）
+    /// 戻り値: 補間されたサンプル値
     fn interpolate(&self, buffer: &[T], read_pos: f64) -> T {
         let len = buffer.len();
         
+        // 整数部と小数部の分離
         let index_i = read_pos.floor() as usize;
         let frac = read_pos - (index_i as f64);
         let frac_t = T::from(frac).unwrap();

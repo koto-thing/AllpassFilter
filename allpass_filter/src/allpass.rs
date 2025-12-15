@@ -4,9 +4,9 @@ use crate::interpolation::{Interpolator, Linear};
 use crate::parameter::SmoothedParam;
 
 pub struct AllPassFilter<T, I> {
-    delay_line: DelayLine<T, I>,
-    delay_length: SmoothedParam<T>,
-    g: SmoothedParam<T>,
+    delay_line: DelayLine<T, I>,    // 遅延線
+    delay_length: SmoothedParam<T>, // 遅延時間（サンプル単位）
+    g: SmoothedParam<T>,            // フィードバックゲイン
 }
 
 impl<T: Float> AllPassFilter<T, Linear> {

@@ -21,6 +21,9 @@ impl CombFilter {
         }
     }
 
+    /// オーディオサンプルを処理
+    /// `input`: 入力サンプル
+    /// 戻り値: 出力サンプル
     fn process(&mut self, input: f32) -> f32 {
         let delayed = self.delay_line.read_interpolated(self.delay_samples);
         let output = input + (delayed * self.feedback);
@@ -31,8 +34,8 @@ impl CombFilter {
 
 /// シュレーダー・リバーブ本体
 struct SchroederReverb {
-    combs: Vec<CombFilter>,
-    apfs: Vec<AllPassFilter<f32, Linear>>,
+    combs: Vec<CombFilter>,                // 並列コムフィルタ
+    apfs: Vec<AllPassFilter<f32, Linear>>, // 直列オールパスフィルタ
 }
 
 impl SchroederReverb {
@@ -41,15 +44,18 @@ impl SchroederReverb {
         let comb_params = [
             (29.7, 0.95), (37.1, 0.93), (41.1, 0.91), (43.7, 0.89)
         ];
+
         // 直列オールパスフィルタ
         let apf_params = [
             (5.0, 0.7), (1.7, 0.7)
         ];
 
+        // コムフィルタとオールパスフィルタの生成
         let combs = comb_params.iter()
             .map(|(ms, fb)| CombFilter::new(sample_rate, *ms, *fb))
             .collect();
 
+        // オールパスフィルタの生成
         let apfs = apf_params.iter()
             .map(|(ms, g)| {
                 let s = (sample_rate as f64 * (ms / 1000.0)) as f32;
@@ -60,6 +66,9 @@ impl SchroederReverb {
         Self { combs, apfs }
     }
 
+    /// オーディオサンプルを処理
+    /// `input`: 入力サンプル
+    /// 戻り値: 出力サンプル
     fn process(&mut self, input: f32) -> f32 {
         // コムフィルタを並列で処理
         let mut wet = 0.0;
@@ -77,8 +86,8 @@ impl SchroederReverb {
 }
 
 pub struct MyReverb {
-    params: Arc<MyReverbParams>,
-    reverb: Option<SchroederReverb>,
+    params: Arc<MyReverbParams>,     // パラメータ
+    reverb: Option<SchroederReverb>, // リバーブ本体
 }
 
 #[derive(Params)]
@@ -111,7 +120,7 @@ impl Default for MyReverb {
 }
 
 impl Plugin for MyReverb {
-    const NAME: &'static str = "Simple Rust Reverb";
+    const NAME: &'static str = "Simple Reverb";
     const VENDOR: &'static str = "Kenta Goto";
     const URL: &'static str = "https://github.com/koto-thing";
     const EMAIL: &'static str = "gotoukenta62@gmail.com";
